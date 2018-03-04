@@ -1,0 +1,13 @@
+*.bat
+*.class
+/bin/
+.project
+*.sh
+/sample-solution/
+.classpath
+.project
+notes.txt
+/src - Copy/
+*.zip
+*.symlink
+*.jar
