@@ -34,13 +34,16 @@ public class CLI {
         DictionaryTree d = loadWords(new File(args[0]));
         System.out.println("done");
 
-        System.out.println("Enter prefixes for prediction below.");
+//        System.out.println("Enter prefixes for prediction below.");
+//
+//        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
+//            while (true) {
+//                System.out.println("---> " + d.predict(fromUser.readLine()));
+//            }
+//        }
 
-        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
-            while (true) {
-                System.out.println("---> " + d.predict(fromUser.readLine()));
-            }
-        }
+        System.out.println(d.contains("a"));
+        
     }
 
 }
