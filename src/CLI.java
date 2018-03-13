@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * @author Kelsey McKenna
@@ -34,15 +35,17 @@ public class CLI {
         DictionaryTree d = loadWords(new File(args[0]));
         System.out.println("done");
 
-//        System.out.println("Enter prefixes for prediction below.");
-//
-//        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
-//            while (true) {
-//                System.out.println("---> " + d.predict(fromUser.readLine()));
-//            }
-//        }
+        System.out.println("Enter prefixes for prediction below.");
 
-        System.out.println(d.contains("a"));
+        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
+            while (true) {
+                System.out.println("---> " + d.predict(fromUser.readLine()));
+            }
+        }
+//        
+//        DictionaryTree newTree = new DictionaryTree();
+//        newTree.insert("abecawdlo");
+//        newTree.insert("bdeadad");
         
     }
 
