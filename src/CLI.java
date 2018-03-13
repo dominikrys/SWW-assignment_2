@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * @author Kelsey McKenna
@@ -37,16 +38,26 @@ public class CLI {
 
         System.out.println("Enter prefixes for prediction below.");
 
-        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
-            while (true) {
-                System.out.println("---> " + d.predict(fromUser.readLine()));
-            }
-        }
+//        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
+//            while (true) {
+//                System.out.println("---> " + d.predict(fromUser.readLine()));
+//            }
+//        }
 //        
 //        DictionaryTree newTree = new DictionaryTree();
 //        newTree.insert("abecawdlo");
 //        newTree.insert("bdeadad");
         
+//        System.out.println(d.size());
+        //223875
+        //223878
+//        DictionaryTree unit = new DictionaryTree();
+//        unit.insert("info");
+//        unit.insert("information");
+//        unit.remove("information");
+//        System.out.println(unit.contains("info"));
+        System.out.println(d.size());
+//        
     }
 
 }

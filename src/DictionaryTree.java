@@ -90,7 +90,59 @@ public class DictionaryTree {
    * @return whether or not the parent can delete this node from its children
    */
   boolean remove(String word) {
-    throw new RuntimeException("DictionaryTree.remove not implemented yet");
+    if (contains(word)) {
+      int removeIndex = removeHelper(word, 0, 0);
+      if (removeIndex != -1) {
+        removeRemover(word, removeIndex, 0);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  int removeHelper(String word, int indexOfLastEndOfWord, int currentIndex) {
+    int result = -1;
+    if (word.length() > 1) {
+      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+        Character key = entry.getKey();
+        DictionaryTree value = entry.getValue();
+
+        if (key.equals(word.charAt(0))) {
+          if (value.isEndOfWord()) {
+            result = value.removeHelper(word.substring(1, word.length()), currentIndex, currentIndex + 1);
+          } else {
+            result = value.removeHelper(word.substring(1, word.length()), indexOfLastEndOfWord,
+                currentIndex + 1);
+          }
+          break;
+        }
+      }
+    } else {
+      if (this.isLeaf() || this.endOfWord == false) {
+        result = indexOfLastEndOfWord;
+      } else {
+        this.setEndOfWord(false);
+        result = -1;
+      }
+    }
+    return result;
+  }
+
+  void removeRemover(String word, int indexOfLastEndOfWord /* the index to remove after */,
+      int currentIndex) {
+    if (indexOfLastEndOfWord < currentIndex) {
+      children.clear();
+    } else {
+      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+        Character key = entry.getKey();
+        DictionaryTree value = entry.getValue();
+        if (key.equals(word.charAt(0))) {
+          value.removeRemover(word.substring(1, word.length()), indexOfLastEndOfWord,
+              currentIndex + 1);
+        }
+      }
+    }
   }
 
   /**
@@ -134,14 +186,15 @@ public class DictionaryTree {
   Optional<String> predictHelper(String inputString, String initialString) {
     Optional<String> result = Optional.empty();
     if (inputString.length() > 0) {
-        for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
-          Character key = entry.getKey();
-          DictionaryTree value = entry.getValue();
-          if (key.equals(inputString.charAt(0))) {
-            result = value.predictHelper(inputString.substring(1, inputString.length()), initialString);
-            break;
-          }
+      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+        Character key = entry.getKey();
+        DictionaryTree value = entry.getValue();
+        if (key.equals(inputString.charAt(0))) {
+          result =
+              value.predictHelper(inputString.substring(1, inputString.length()), initialString);
+          break;
         }
+      }
     }
     // adequate size to check any word
     else {
@@ -159,7 +212,6 @@ public class DictionaryTree {
       DictionaryTree value = entry.getValue();
 
       if (value.isEndOfWord()) {
-        System.out.println(inputString + key);
         result = Optional.of(inputString + key);
         break;
       } else {
@@ -233,12 +285,10 @@ public class DictionaryTree {
    * @return the number of nodes in this tree
    */
   int size() {
-    int size = 0;
+    int size = 1;
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
       DictionaryTree value = entry.getValue();
-
-      size++;
 
       size += value.size();
     }

@@ -1,5 +1,7 @@
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
@@ -42,14 +44,14 @@ public class DictionaryTreeTests {
     unit.insert("worg");
     Assertions.assertEquals(2, unit.numLeaves());
   }
-  
+
   @Test
   public void maximumBranchingShouldBeOneAfterSingleWordInsertion() {
     DictionaryTree unit = new DictionaryTree();
     unit.insert("word");
     Assertions.assertEquals(1, unit.maximumBranching());
   }
-  
+
   @Test
   public void maximumBranchingShouldBeTwoAfterSecondWordInsertionWithCommonLetters() {
     DictionaryTree unit = new DictionaryTree();
@@ -57,7 +59,7 @@ public class DictionaryTreeTests {
     unit.insert("wdrd");
     Assertions.assertEquals(2, unit.maximumBranching());
   }
-  
+
   @Test
   public void longestWordReturnsTheLongestWord() {
     DictionaryTree unit = new DictionaryTree();
@@ -73,7 +75,7 @@ public class DictionaryTreeTests {
     unit.insert("dwaddsasawddawda");
     Assertions.assertEquals("dwaddsasawddawda", unit.longestWord());
   }
-  
+
   @Test
   public void allWordsReturnsAllInsertedWords() {
     DictionaryTree unit = new DictionaryTree();
@@ -89,15 +91,15 @@ public class DictionaryTreeTests {
     insertedWords.add("nfiawnfawin");
     insertedWords.add("dnwiadnwinwandiwdani");
     insertedWords.add("dnwiadnwi");
-    
+
     // Insert words from arraylist
     for (String s : insertedWords) {
       unit.insert(s);
     }
-    
+
     // Take all words from dictionary
     List<String> extractedWords = unit.allWords();
-    
+
     // See how many of the words from the original arraylist are in the DictionaryTree
     int dictContainsWord = 0;
     for (String s : insertedWords) {
@@ -105,7 +107,62 @@ public class DictionaryTreeTests {
         dictContainsWord++;
       }
     }
-    
+
     Assertions.assertEquals(dictContainsWord, extractedWords.size());
   }
+
+  @Test
+  public void predictReturnsEmptyIfPrefixNotPartOfAnyWord() {
+    DictionaryTree unit = new DictionaryTree();
+    assertEquals(Optional.empty(), unit.predict("word"));
+  }
+
+  @Test
+  public void predictReturnsAPredictedWord() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("information");
+    assertEquals(Optional.of("information"), unit.predict("info"));
+  }
+
+  @Test
+  public void removeRemovesSingleWord() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    unit.remove("word");
+    Assertions.assertFalse(unit.contains("word"));
+  }
+
+  @Test
+  public void removeReturnsTrueIfWordCanBeRemoved() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    Assertions.assertTrue(unit.remove("word"));
+  }
+
+  @Test
+  public void removeReturnsFalseIfWordCantBeRemoved() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    Assertions.assertFalse(unit.remove("worddwa"));
+  }
+
+  @Test
+  public void removeRemovesWordThatsPartOfAnotherWordWithoutRemoovingTheOtherWord() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("info");
+    unit.insert("information");
+    unit.remove("info");
+    Assertions.assertFalse(unit.contains("info"));
+  }
+
+  @Test
+  public void removeRemovesEndOfWordLeavingAnyPreviousWords() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("info");
+    unit.insert("information");
+    unit.remove("information");
+    Assertions.assertTrue(unit.contains("info"));
+  }
+  
+  // include size test
 }
