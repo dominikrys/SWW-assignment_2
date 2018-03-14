@@ -29,23 +29,7 @@ public class DictionaryTree {
    * @param word the word to insert
    */
   public void insert(String word) {
-    if (!contains(word)) {
-      DictionaryTree tempTree = new DictionaryTree();
-      if (word.length() > 0) {
-
-        if (children.containsKey(word.charAt(0))) {
-          tempTree = children.get(word.charAt(0));
-        }
-
-        tempTree.insert(word.substring(1, word.length()));
-
-        if (word.length() == 1) {
-          tempTree.endOfWord = true;
-        }
-
-        children.put(word.charAt(0), tempTree);
-      }
-    }
+    insert(word, 0);
   }
 
   /**
@@ -56,30 +40,36 @@ public class DictionaryTree {
    * @param popularity the popularity of the inserted word
    */
   public void insert(String word, int popularity) {
-    if (!contains(word)) {
-      DictionaryTree tempTree = new DictionaryTree();
-      if (word.length() > 0) {
+    // Create a temporary DictionaryTree that will have characters inserted into
+    DictionaryTree tempTree = new DictionaryTree();
+    if (word.length() > 0) {
 
-        if (children.containsKey(word.charAt(0))) {
-          tempTree = children.get(word.charAt(0));
-        }
+      // Insert characters into children
+      if (children.containsKey(word.charAt(0))) {
+        tempTree = children.get(word.charAt(0));
+      }
 
-        tempTree.insert(word.substring(1, word.length()), popularity);
+      tempTree.insert(word.substring(1, word.length()), popularity);
 
-        if (word.length() == 1) {
-          tempTree.endOfWord = true;
+      // If on the last character, set endOfWord to true, and set the popularity - if popularity
+      // already set
+      // it will be overridden
+      if (word.length() == 1) {
+        tempTree.endOfWord = true;
+        if (popularity == 0) {
+          tempTree.popularity = Optional.empty();
+        } else {
           tempTree.popularity = Optional.of(popularity);
         }
-
-        children.put(word.charAt(0), tempTree);
       }
+
+      children.put(word.charAt(0), tempTree);
     }
   }
 
   /**
-   * Removes the specified word from this dictionary. Returns true if the caller can delete this
-   * node without losing part of the dictionary, i.e. if this node has no children after deleting
-   * the specified word.
+   * Removes the specified word from this dictionary. Returns true if the word can be removed as
+   * it's in the DictionaryTree, and false if the input word isn't in the tree.
    *
    * @param word the word to delete from this dictionary
    * @return whether or not the parent can delete this node from its children
@@ -186,8 +176,9 @@ public class DictionaryTree {
 
   /**
    * Predicts the (at most) n most popular full English words based on the specified prefix. If no
-   * word with the specified prefix is found, an empty Optional is returned.
+   * word with the specified prefix is found, an empty list is returned.
    *
+   * 
    * @param prefix the prefix of the words found
    * @return the (at most) n most popular words with the specified prefix
    */

@@ -149,6 +149,13 @@ public class DictionaryTreeTests {
     unit.insert("information");
     assertEquals(Optional.of("information"), unit.predict("info"));
   }
+  
+  @Test
+  public void predictCanReturnItself() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("information");
+    assertEquals(Optional.of("information"), unit.predict("information"));
+  }
 
   @Test
   public void removeRemovesSingleWord() {
@@ -210,6 +217,13 @@ public class DictionaryTreeTests {
     correctList.add("physical");
     
     assertEquals(correctList, predictedWords);
+  }
+  
+  @Test
+  public void predictReturnsEmptyListIfNoWordFound() {
+    DictionaryTree unit = new DictionaryTree();
+    ArrayList <String> emptyArrayList = new ArrayList<String>();
+    assertEquals(emptyArrayList, unit.predict("word", 4));
   }
   
   // more tests

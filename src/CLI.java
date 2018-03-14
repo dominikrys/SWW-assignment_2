@@ -1,13 +1,7 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 
 /**
  * @author Kelsey McKenna
@@ -37,9 +31,10 @@ public class CLI {
     }
 
     public static void main(String[] args) throws IOException {
-//        System.out.print("Loading dictionary ... ");
-//        DictionaryTree d = loadWords(new File(args[0]));
-//        System.out.println("done");
+        System.out.print("Loading dictionary ... ");
+        DictionaryTree d = loadWords(new File(args[0]));
+        System.out.println("done");
+        System.out.println(d.size());
 
 //        System.out.println("Enter prefixes for prediction below.");
 
