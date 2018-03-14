@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 
@@ -23,8 +24,10 @@ public class CLI {
         try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
             String word;
             DictionaryTree d = new DictionaryTree();
+            int wordLine = 1;
             while ((word = reader.readLine()) != null) {
-                d.insert(word);
+                d.insert(word, wordLine);
+                wordLine++;
             }
 
             return d;
@@ -36,11 +39,11 @@ public class CLI {
         DictionaryTree d = loadWords(new File(args[0]));
         System.out.println("done");
 
-        System.out.println("Enter prefixes for prediction below.");
+//        System.out.println("Enter prefixes for prediction below.");
 
 //        try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
 //            while (true) {
-//                System.out.println("---> " + d.predict(fromUser.readLine()));
+//                System.out.println("---> " + d.predict(fromUser.readLine()), 3);
 //            }
 //        }
 //        
@@ -56,8 +59,23 @@ public class CLI {
 //        unit.insert("information");
 //        unit.remove("information");
 //        System.out.println(unit.contains("info"));
-        System.out.println(d.size());
+//        System.out.println(d.allWords().size());
+        
+//        DictionaryTree unit = new DictionaryTree();
+//        unit.insert("abcg", 9);
+//        unit.insert("abca", 1);
+//        unit.insert("abcc", 3);
+//        unit.insert("abcd", 3);
+//        unit.insert("abcf", 8);
+//        unit.insert("abch", 0);
+//        unit.insert("abcb", 2);
+//        unit.insert("abce", 5);
 //        
+        List<String> returned = d.predict("ph", 5);
+        
+        for (String s : returned) {
+          System.out.println(s);
+        }
     }
 
 }

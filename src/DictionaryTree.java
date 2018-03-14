@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +72,7 @@ public class DictionaryTree {
           tempTree = children.get(word.charAt(0));
         }
 
-        tempTree.insert(word.substring(1, word.length()));
+        tempTree.insert(word.substring(1, word.length()), popularity);
 
         if (word.length() == 1) {
           tempTree.setEndOfWord(true);
@@ -110,7 +113,8 @@ public class DictionaryTree {
 
         if (key.equals(word.charAt(0))) {
           if (value.isEndOfWord()) {
-            result = value.removeHelper(word.substring(1, word.length()), currentIndex, currentIndex + 1);
+            result = value.removeHelper(word.substring(1, word.length()), currentIndex,
+                currentIndex + 1);
           } else {
             result = value.removeHelper(word.substring(1, word.length()), indexOfLastEndOfWord,
                 currentIndex + 1);
@@ -180,49 +184,13 @@ public class DictionaryTree {
    *         found.
    */
   Optional<String> predict(String prefix) {
-    return predictHelper(prefix, prefix);
-  }
-
-  Optional<String> predictHelper(String inputString, String initialString) {
-    Optional<String> result = Optional.empty();
-    if (inputString.length() > 0) {
-      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
-        Character key = entry.getKey();
-        DictionaryTree value = entry.getValue();
-        if (key.equals(inputString.charAt(0))) {
-          result =
-              value.predictHelper(inputString.substring(1, inputString.length()), initialString);
-          break;
-        }
-      }
+    ArrayList<String> returnedList = (ArrayList<String>) predict(prefix, 1);
+    if (returnedList.size() == 0) {
+      return Optional.empty();
+    } else {
+      return Optional.of(returnedList.get(0));
     }
-    // adequate size to check any word
-    else {
-      result = predictStringBuilder(initialString);
-    }
-
-    return result;
   }
-
-  Optional<String> predictStringBuilder(String inputString) {
-    Optional<String> result = Optional.empty();
-
-    for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
-      Character key = entry.getKey();
-      DictionaryTree value = entry.getValue();
-
-      if (value.isEndOfWord()) {
-        result = Optional.of(inputString + key);
-        break;
-      } else {
-        result = value.predictStringBuilder(inputString + key);
-        break;
-      }
-    }
-
-    return result;
-  }
-
 
   /**
    * Predicts the (at most) n most popular full English words based on the specified prefix. If no
@@ -232,7 +200,130 @@ public class DictionaryTree {
    * @return the (at most) n most popular words with the specified prefix
    */
   List<String> predict(String prefix, int n) {
-    throw new RuntimeException("DictionaryTree.predict not implemented yet");
+    return predictHelper(prefix, prefix, n);
+  }
+
+  List<String> predictHelper(String inputString, String initialString, int n) {
+    List<String> result = new ArrayList<String>();
+    if (inputString.length() > 0) {
+      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+        Character key = entry.getKey();
+        DictionaryTree value = entry.getValue();
+        if (key.equals(inputString.charAt(0))) {
+          result =
+              value.predictHelper(inputString.substring(1, inputString.length()), initialString, n);
+          break;
+        }
+      }
+    }
+    // adequate size to check any word
+    else {
+      // sort hashmap
+      HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(initialString);
+      
+      ///
+      for (Map.Entry<String, Optional<Integer>> entry : returnedHashMap.entrySet()) {
+        String key = entry.getKey();
+        Optional<Integer> value = entry.getValue();
+
+        System.out.println(key + ": " + value.toString());
+      }
+      System.out.println("---END---");
+      ///
+      
+      List<String> mapKeys = new ArrayList<>(returnedHashMap.keySet());
+      List<Optional<Integer>> mapValues = new ArrayList<>(returnedHashMap.values());
+
+      List<Integer> mapValuesConverted = new ArrayList<>();
+      for (Optional<Integer> value : mapValues) {
+        if (value.isPresent()) {
+          mapValuesConverted.add(value.get());
+        } else {
+          mapValuesConverted.add(0);
+        }
+      }
+
+      Collections.sort(mapValuesConverted);
+      Collections.sort(mapKeys);
+
+      LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+
+      Iterator<Integer> valueIt = mapValuesConverted.iterator();
+      while (valueIt.hasNext()) {
+        Integer val = valueIt.next();
+        Iterator<String> keyIt = mapKeys.iterator();
+
+        while (keyIt.hasNext()) {
+          String key = keyIt.next();
+          Integer comp1 = null;
+          if (returnedHashMap.get(key).isPresent()) {
+            comp1 = returnedHashMap.get(key).get();
+          } else {
+            comp1 = 0;
+          }
+
+          Integer comp2 = val;
+
+          if (comp1.equals(comp2)) {
+            keyIt.remove();
+            sortedMap.put(key, val);
+            break;
+          }
+        }
+      }
+
+      // check amount of zeros
+      int zeroPopularityCounter = 0;
+      for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+        Integer value = entry.getValue();
+        if (value == 0) {
+          zeroPopularityCounter++;
+        }
+      }
+
+      int limit = 0;
+      if (n > sortedMap.size()) {
+        limit = sortedMap.size();
+      } else {
+        limit = n;
+      }
+
+      ArrayList<String> strings = new ArrayList<String>();
+      strings.addAll(sortedMap.keySet());
+
+      ArrayList<Integer> popularities = new ArrayList<Integer>();
+      popularities.addAll(sortedMap.values());
+
+      result = new ArrayList<String>();
+      while (result.size() < limit) {
+        if (zeroPopularityCounter > limit) {
+          zeroPopularityCounter = 0;
+        }
+        result.add(strings.get(zeroPopularityCounter));
+        zeroPopularityCounter++;
+      }
+
+    }
+
+    return result;
+  }
+
+  HashMap<String, Optional<Integer>> predictStringBuilder(String inputString) {
+    HashMap<String, Optional<Integer>> result = new HashMap<String, Optional<Integer>>();
+
+    for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+      Character key = entry.getKey();
+      DictionaryTree value = entry.getValue();
+
+      if (value.isEndOfWord()) {
+        result.put(inputString + key, value.popularity);
+        result.putAll(value.predictStringBuilder(inputString + key));
+      } else if (!value.isLeaf()){
+        result.putAll(value.predictStringBuilder(inputString + key));
+      }
+    }
+
+    return result;
   }
 
   /**

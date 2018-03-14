@@ -29,6 +29,24 @@ public class DictionaryTreeTests {
     unit.insert("word", 0);
     Assertions.assertEquals("word".length(), unit.height());
   }
+  
+  @Test
+  public void sizeShouldBeAmountOfCharactersAndRootAfterOneInsertion() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    Assertions.assertEquals(5, unit.size());
+  }
+  
+  @Test
+  public void sizeReturnsCorrectAmountOfNodesAfterMultipleInsertions() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    unit.insert("wors");
+    unit.insert("wtty");
+    unit.insert("r");
+    unit.insert("test");
+    Assertions.assertEquals(14, unit.size());
+  }
 
   @Test
   public void noOfLeavesShouldBeOneAfterSingleWordInsertion() {
