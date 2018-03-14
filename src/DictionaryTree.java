@@ -28,7 +28,7 @@ public class DictionaryTree {
    *
    * @param word the word to insert
    */
-  void insert(String word) {
+  public void insert(String word) {
     if (!contains(word)) {
       DictionaryTree tempTree = new DictionaryTree();
       if (word.length() > 0) {
@@ -40,20 +40,12 @@ public class DictionaryTree {
         tempTree.insert(word.substring(1, word.length()));
 
         if (word.length() == 1) {
-          tempTree.setEndOfWord(true);
+          tempTree.endOfWord = true;
         }
 
         children.put(word.charAt(0), tempTree);
       }
     }
-  }
-
-  void setEndOfWord(boolean input) {
-    this.endOfWord = input;
-  }
-
-  boolean isEndOfWord() {
-    return endOfWord;
   }
 
   /**
@@ -63,7 +55,7 @@ public class DictionaryTree {
    * @param word the word to insert
    * @param popularity the popularity of the inserted word
    */
-  void insert(String word, int popularity) {
+  public void insert(String word, int popularity) {
     if (!contains(word)) {
       DictionaryTree tempTree = new DictionaryTree();
       if (word.length() > 0) {
@@ -75,7 +67,7 @@ public class DictionaryTree {
         tempTree.insert(word.substring(1, word.length()), popularity);
 
         if (word.length() == 1) {
-          tempTree.setEndOfWord(true);
+          tempTree.endOfWord = true;
           tempTree.popularity = Optional.of(popularity);
         }
 
@@ -92,7 +84,7 @@ public class DictionaryTree {
    * @param word the word to delete from this dictionary
    * @return whether or not the parent can delete this node from its children
    */
-  boolean remove(String word) {
+  public boolean remove(String word) {
     if (contains(word)) {
       int removeIndex = removeHelper(word, 0, 0);
       if (removeIndex != -1) {
@@ -104,7 +96,7 @@ public class DictionaryTree {
     }
   }
 
-  int removeHelper(String word, int indexOfLastEndOfWord, int currentIndex) {
+  private int removeHelper(String word, int indexOfLastEndOfWord, int currentIndex) {
     int result = -1;
     if (word.length() > 1) {
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -112,7 +104,7 @@ public class DictionaryTree {
         DictionaryTree value = entry.getValue();
 
         if (key.equals(word.charAt(0))) {
-          if (value.isEndOfWord()) {
+          if (value.endOfWord) {
             result = value.removeHelper(word.substring(1, word.length()), currentIndex,
                 currentIndex + 1);
           } else {
@@ -126,14 +118,14 @@ public class DictionaryTree {
       if (this.isLeaf() || this.endOfWord == false) {
         result = indexOfLastEndOfWord;
       } else {
-        this.setEndOfWord(false);
+        this.endOfWord = false;
         result = -1;
       }
     }
     return result;
   }
 
-  void removeRemover(String word, int indexOfLastEndOfWord /* the index to remove after */,
+  private void removeRemover(String word, int indexOfLastEndOfWord /* the index to remove after */,
       int currentIndex) {
     if (indexOfLastEndOfWord < currentIndex) {
       children.clear();
@@ -155,7 +147,7 @@ public class DictionaryTree {
    * @param word the word whose presence will be checked
    * @return true if the specified word is stored in this tree; false otherwise
    */
-  boolean contains(String word) {
+  public boolean contains(String word) {
     boolean containsWord = false;
     if (word.length() > 0) {
       // Check if first letter is a child node
@@ -165,7 +157,7 @@ public class DictionaryTree {
           containsWord = extractedDictionaryTree.contains(word.substring(1, word.length()));
         }
         // If only one character left, check if end of word
-        else if (children.get(word.charAt(0)).isEndOfWord() == true) {
+        else if (children.get(word.charAt(0)).endOfWord) {
           containsWord = true;
         } else {
           containsWord = false;
@@ -183,7 +175,7 @@ public class DictionaryTree {
    * @return a word that starts with the given prefix, or an empty optional if no such word is
    *         found.
    */
-  Optional<String> predict(String prefix) {
+  public Optional<String> predict(String prefix) {
     ArrayList<String> returnedList = (ArrayList<String>) predict(prefix, 1);
     if (returnedList.size() == 0) {
       return Optional.empty();
@@ -199,11 +191,11 @@ public class DictionaryTree {
    * @param prefix the prefix of the words found
    * @return the (at most) n most popular words with the specified prefix
    */
-  List<String> predict(String prefix, int n) {
+  public List<String> predict(String prefix, int n) {
     return predictHelper(prefix, prefix, n);
   }
 
-  List<String> predictHelper(String inputString, String initialString, int n) {
+  private List<String> predictHelper(String inputString, String initialString, int n) {
     List<String> result = new ArrayList<String>();
     if (inputString.length() > 0) {
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -220,7 +212,7 @@ public class DictionaryTree {
     else {
       // sort hashmap
       HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(initialString);
-      
+
       List<String> mapKeys = new ArrayList<>(returnedHashMap.keySet());
       List<Optional<Integer>> mapValues = new ArrayList<>(returnedHashMap.values());
 
@@ -297,17 +289,17 @@ public class DictionaryTree {
     return result;
   }
 
-  HashMap<String, Optional<Integer>> predictStringBuilder(String inputString) {
+  private HashMap<String, Optional<Integer>> predictStringBuilder(String inputString) {
     HashMap<String, Optional<Integer>> result = new HashMap<String, Optional<Integer>>();
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
       Character key = entry.getKey();
       DictionaryTree value = entry.getValue();
 
-      if (value.isEndOfWord()) {
+      if (value.endOfWord) {
         result.put(inputString + key, value.popularity);
         result.putAll(value.predictStringBuilder(inputString + key));
-      } else if (!value.isLeaf()){
+      } else if (!value.isLeaf()) {
         result.putAll(value.predictStringBuilder(inputString + key));
       }
     }
@@ -319,7 +311,7 @@ public class DictionaryTree {
    * @return the number of leaves in this tree, i.e. the number of words which are not prefixes of
    *         any other word.
    */
-  int numLeaves() {
+  public int numLeaves() {
     int leavesNo = 0;
 
     if (!children.isEmpty()) {
@@ -340,7 +332,7 @@ public class DictionaryTree {
   /**
    * @return the maximum number of children held by any node in this tree
    */
-  int maximumBranching() {
+  public int maximumBranching() {
     int maxBranch = children.size();
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -357,14 +349,14 @@ public class DictionaryTree {
   /**
    * @return the height of this tree, i.e. the length of the longest branch
    */
-  int height() {
+  public int height() {
     return longestWord().length();
   }
 
   /**
    * @return the number of nodes in this tree
    */
-  int size() {
+  public int size() {
     int size = 1;
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -379,11 +371,11 @@ public class DictionaryTree {
   /**
    * @return the longest word in this tree
    */
-  String longestWord() {
+  public String longestWord() {
     return longestHelper("");
   }
 
-  String longestHelper(String inputString) {
+  private String longestHelper(String inputString) {
     ArrayList<String> words = new ArrayList<String>();
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
       Character key = entry.getKey();
@@ -408,12 +400,12 @@ public class DictionaryTree {
   /**
    * @return all words stored in this tree as a list
    */
-  List<String> allWords() {
+  public List<String> allWords() {
 
     return allWordsHelper("");
   }
 
-  ArrayList<String> allWordsHelper(String inputString) {
+  private ArrayList<String> allWordsHelper(String inputString) {
     ArrayList<String> stringList = new ArrayList<String>();
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -422,7 +414,7 @@ public class DictionaryTree {
 
       if (value.isLeaf() == true) {
         stringList.add(inputString + key);
-      } else if (value.isEndOfWord()) {
+      } else if (value.endOfWord) {
         stringList.add(inputString + key);
         stringList.addAll(value.allWordsHelper(inputString + key));
       } else {
@@ -439,7 +431,7 @@ public class DictionaryTree {
    * @param node which will be checked whether it's a lead node
    * @return true if the passed node is a leaf, false otherwise
    */
-  boolean isLeaf() {
+  private boolean isLeaf() {
     if (children.isEmpty()) {
       return true;
     } else {
