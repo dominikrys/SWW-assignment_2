@@ -221,16 +221,6 @@ public class DictionaryTree {
       // sort hashmap
       HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(initialString);
       
-      ///
-      for (Map.Entry<String, Optional<Integer>> entry : returnedHashMap.entrySet()) {
-        String key = entry.getKey();
-        Optional<Integer> value = entry.getValue();
-
-        System.out.println(key + ": " + value.toString());
-      }
-      System.out.println("---END---");
-      ///
-      
       List<String> mapKeys = new ArrayList<>(returnedHashMap.keySet());
       List<Optional<Integer>> mapValues = new ArrayList<>(returnedHashMap.values());
 
@@ -293,10 +283,9 @@ public class DictionaryTree {
 
       ArrayList<Integer> popularities = new ArrayList<Integer>();
       popularities.addAll(sortedMap.values());
-
       result = new ArrayList<String>();
       while (result.size() < limit) {
-        if (zeroPopularityCounter > limit) {
+        if (zeroPopularityCounter >= limit) {
           zeroPopularityCounter = 0;
         }
         result.add(strings.get(zeroPopularityCounter));

@@ -1,4 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +48,12 @@ public class DictionaryTreeTests {
     unit.insert("r");
     unit.insert("test");
     Assertions.assertEquals(14, unit.size());
+  }
+  
+  @Test
+  public void sizeReturnsRootNodeWhenNoWordsInserted() {
+    DictionaryTree unit = new DictionaryTree();
+    Assertions.assertEquals(1, unit.size());
   }
 
   @Test
@@ -182,5 +190,27 @@ public class DictionaryTreeTests {
     Assertions.assertTrue(unit.contains("info"));
   }
   
-  // include size test
+  @Test
+  public void predictWithPopularityReturnsObjectsAccordingToPopularity() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("phone", 4);
+    unit.insert("photo", 8);
+    unit.insert("pile", 37);
+    unit.insert("test");
+    unit.insert("phones", 247);
+    unit.insert("physical", 484);
+    unit.insert("photos", 90);
+    
+    ArrayList<String> predictedWords = (ArrayList<String>) unit.predict("ph", 5);
+    ArrayList<String> correctList = new ArrayList<String>();
+    correctList.add("phone");
+    correctList.add("photo");
+    correctList.add("photos");
+    correctList.add("phones");
+    correctList.add("physical");
+    
+    assertEquals(correctList, predictedWords);
+  }
+  
+  // more tests
 }
