@@ -5,9 +5,6 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-/**
- * @author Kelsey McKenna
- */
 public class DictionaryTreeTests {
 
   @Test
@@ -184,11 +181,12 @@ public class DictionaryTreeTests {
   }
 
   @Test
-  public void removeRemovesWordThatsPartOfAnotherWordWithoutRemoovingTheOtherWord() {
+  public void removeRemovesWordThatsPartOfAnotherWordWithoutRemovingTheOtherWord() {
     DictionaryTree unit = new DictionaryTree();
     unit.insert("info");
     unit.insert("information");
     unit.remove("info");
+    Assertions.assertTrue(unit.contains("information"));
     Assertions.assertFalse(unit.contains("info"));
   }
 
@@ -212,12 +210,12 @@ public class DictionaryTreeTests {
   @Test
   public void predictWithPopularityReturnsObjectsAccordingToPopularity() {
     DictionaryTree unit = new DictionaryTree();
-    unit.insert("phone", 4);
-    unit.insert("photo", 8);
+    unit.insert("phone", 484);
+    unit.insert("photo", 247);
     unit.insert("pile", 37);
     unit.insert("test");
-    unit.insert("phones", 247);
-    unit.insert("physical", 484);
+    unit.insert("phones", 8);
+    unit.insert("physical", 4);
     unit.insert("photos", 90);
 
     ArrayList<String> predictedWords = (ArrayList<String>) unit.predict("ph", 5);
@@ -246,9 +244,34 @@ public class DictionaryTreeTests {
     unit.insert("word", 1);
 
     ArrayList<String> correctList = new ArrayList<String>();
-    correctList.add("word");
     correctList.add("wor");
+    correctList.add("word");
 
     assertEquals(correctList, unit.predict("wo", 2));
+  }
+
+  @Test
+  public void removeCorrectlyRemovesOneLetterWords() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("m");
+    unit.insert("mat");
+    unit.insert("mad");
+    unit.remove("m");
+    Assertions.assertEquals(false, unit.contains("m"));
+    Assertions.assertEquals(true, unit.contains("mat"));
+    Assertions.assertEquals(true, unit.contains("mad"));
+  }
+
+
+  @Test
+  public void removeCorrectlyRemovesLastLetterOfAWord() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word");
+    unit.insert("word1");
+    int beforeSize = unit.size();
+    unit.remove("word1");
+    int afterSize = unit.size();
+    Assertions.assertEquals(false, unit.contains("word1"));
+    Assertions.assertEquals(1, beforeSize - afterSize);
   }
 }

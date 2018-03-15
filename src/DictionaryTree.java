@@ -48,12 +48,10 @@ public class DictionaryTree {
       if (children.containsKey(word.charAt(0))) {
         tempTree = children.get(word.charAt(0));
       }
-
       tempTree.insert(word.substring(1, word.length()), popularity);
 
       // If on the last character, set endOfWord to true, and set the popularity - if popularity
-      // already set
-      // it will be overridden
+      // already set it will be overridden
       if (word.length() == 1) {
         tempTree.endOfWord = true;
         if (popularity == 0) {
@@ -80,7 +78,6 @@ public class DictionaryTree {
     if (contains(word)) {
 
       int removeIndex = removeHelper(word, 0, 0);
-
       // removeIndex !- -1 when nodes have to be removed, and not when just a node has to be set
       // to not endOfWord
       if (removeIndex != -1) {
@@ -114,7 +111,8 @@ public class DictionaryTree {
         }
       }
     }
-    // When on last character
+    // When on last character if more nodes have to be removed, return the index of the last node,
+    // otherwise return -1
     else {
       if (this.isLeaf() || this.endOfWord == false) {
         result = indexOfLastEndOfWord;
@@ -254,7 +252,7 @@ public class DictionaryTree {
       // Get a hashmap of all words starting with the specified prefix and their popularities
       HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(originalString);
 
-      // Insert prefix into returned hashmap if the prefi is contained in the tree
+      // Insert prefix into returned hashmap if the prefix is contained in the tree
       if (!popularityOfPrefix.isPresent()) {
         returnedHashMap.put(originalString, popularityOfPrefix);
       } else if (popularityOfPrefix.get() != -1) {
@@ -275,9 +273,9 @@ public class DictionaryTree {
         }
       }
 
-      // Sort the hashmap by values
-      Collections.sort(mapValuesConverted);
-      Collections.sort(mapKeys);
+      // Sort the hashmap by values in descending order
+      Collections.sort(mapValuesConverted, Collections.reverseOrder());
+      Collections.sort(mapKeys, Collections.reverseOrder());
 
       LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
 
@@ -305,17 +303,6 @@ public class DictionaryTree {
         }
       }
 
-      // Check amount of words with popularity of 0 - these haven't had a popularity specified and
-      // therefore should appear at the end of numbers with a popularity. Chosen not to use MAX_INT
-      // as having 0 for no popularity made more sense
-      int zeroPopularityCounter = 0;
-      for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-        Integer value = entry.getValue();
-        if (value == 0) {
-          zeroPopularityCounter++;
-        }
-      }
-
       // Maximum number of words to be output
       int limit = 0;
       if (n > sortedMap.size()) {
@@ -330,15 +317,12 @@ public class DictionaryTree {
       ArrayList<Integer> popularities = new ArrayList<Integer>();
       popularities.addAll(sortedMap.values());
 
-      // Populate output arraylist with predicted words in order of popularity - words with
-      // popularity of 0 are appended to the end if they're needed
+      // Populate output arraylist with predicted words in order of popularity
       result = new ArrayList<String>();
+      int currentIndex = 0;
       while (result.size() < limit) {
-        if (zeroPopularityCounter >= limit) {
-          zeroPopularityCounter = 0;
-        }
-        result.add(strings.get(zeroPopularityCounter));
-        zeroPopularityCounter++;
+        result.add(strings.get(currentIndex));
+        currentIndex++;
       }
 
     }

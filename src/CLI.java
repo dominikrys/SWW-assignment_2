@@ -1,8 +1,10 @@
+import static org.junit.jupiter.api.DynamicTest.stream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * @author Kelsey McKenna
@@ -32,20 +34,26 @@ public class CLI {
   }
 
   public static void main(String[] args) throws IOException {
-    System.out.print("Loading dictionary ... ");
-    DictionaryTree d = loadWords(new File(args[0]));
-    System.out.println("done");
+//    System.out.print("Loading dictionary ... ");
+//    DictionaryTree d = loadWords(new File(args[0]));
+//    System.out.println("done");
+//
+//    System.out.println("Enter prefixes for prediction below.");
+//
+//    try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
+//      while (true) {
+//        System.out.println("---> " + d.predict(fromUser.readLine()));
+//      }
+//    }
 
-    System.out.println("Enter prefixes for prediction below.");
-
-    try (BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in))) {
-      while (true) {
-        System.out.println("---> " + d.predict(fromUser.readLine()));
-      }
-    }
-
-    // DictionaryTree unit = new DictionaryTree();
-    // System.out.println(unit.maximumBranching());
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("m");
+    unit.insert("mat");
+    unit.insert("mad");
+    unit.remove("m");
+    System.out.println(unit.contains("m")); //should be false
+    System.out.println(unit.contains("mat")); // should be true
+    System.out.println(unit.contains("mad")); // should be true
   }
 
 }
