@@ -1,10 +1,25 @@
 # Solution
-##### GitLab repo: https://git.cs.bham.ac.uk/dxr714/SWW-assignment_2
+###### GitLab repo: https://git.cs.bham.ac.uk/dxr714/SWW-assignment_2
 
-## Comment on the advantages/disadvantages of using a tree for predicting multiple words with ranked popularities
+### Comment on the advantages/disadvantages of using a tree for predicting multiple words with ranked popularities
 
+##### Advantages
 
-## Description of methods
+* The data type is a tree - very efficient for finding word predictions as it would run in logarithmtic time.
+
+* Easy to find words related to the prefix as the algorithm only has to go the depth of the final character in the input prefix, and all words after that depth (including itself) are possible predictions.
+
+* Can hold a very large data set and have a relatively low time complexity as some characters of words would be "shared" between each other.
+
+##### Disadvantages
+
+* Might not be easy to implement smarter word prediction algorithms - for example, many modern smartphone keyboard apps use machine learning to learn how the user types and what words they use often, and implementing something like this into a tree could prove to be difficult.
+
+* May be difficult to implement a form of auto correction (which could go under word prediction) or word prediction for very similar words to the input word as the tree would have to be traversed back up to find possible predictions.
+
+* Doesn't support random access so could be less efficient in some applications.
+
+### Description of methods
 
 * `size` - simply count amount of nodes on each level and return that value. add value of children. Recursive to the top call will get the total of all calls.
 
@@ -24,7 +39,6 @@
 
 * `remove` - first the method checks if the word can be removed - i.e. if it's in the tree. If it can, `removeHelper` is called that checks if the word is part of another word, and if it is, simply sets the `endOfWord` boolean of the passed string to false. -1 is then returned. If the word to be removed is not part of any other word, instead the helper will return the index of the last endOfWord in the input word - past this node all nodes will have to be removed. If this helper returns an index, removeRemover is called that clears the children of the node that was the end of the word.
 
-  * Alternate solution for remove - returns `true` if word can be removed, and returns `false` if the word can't be removed. I didn't see how returning what the assignment asked for initially would be beneficial at all. This shouldn't matter either way as Kelsey McKenna mentioned that this won't be checked.
+  * Alternate used solution for `remove` compared to the original brief - returns `true` if word can be removed, and returns `false` if the word can't be removed. I didn't see how returning what the assignment asked for initially would be beneficial at all. This shouldn't matter either way as Kelsey McKenna mentioned that this won't be checked.
 
-* `predict` - if predict called without a specified amount of outputs, it is passed to the other `predict` method with n = 1. That method first checks if the prefix is a word within itself and if it is, returns its popularity. If it's not, returns `Optional` of -1. This is then passed to a helper. The helper traverses down the tree to get to a depth that words can be predicted from. Once there, if it reaches it, it calls the helper method `predictStringBuilder` which gets all the possible predicted words (words with the entered prefix) and returns them as a `HashMap` with which stored each predicted word with its popularity. The original helper method then adds the prefix if it's also a word into the returned `HashMap` and sorts it by word popularity. Then the specified amount of words is added to the `result` `ArrayList` by popularity - if needed, words without a popularity are assigned to the end of this `ArrayList`. The list is then returned.
-
+* `predict` - if predict called without a specified amount of outputs, it is passed to the other `predict` method with n = 1. That method first checks if the prefix is a word within itself and if it is, returns its popularity. If it's not, returns `Optional` of -1. This is then passed to a helper. The helper traverses down the tree to get to a depth that words can be predicted from. Once there, if it reaches it, it calls the helper method `predictStringBuilder` which gets all the possible predicted words (words with the entered prefix) and returns them as a `HashMap` with which stored each predicted word with its popularity. The original helper method then adds the prefix if it's also a word into the returned `HashMap` and sorts it by word popularity. Then the specified amount of words is added to the `result` `ArrayList` by popularity - if needed, words without a popularity are assigned to the end of this `ArrayList`, as I have chosen for them to essentially have the lowest priority. The list is then returned.
