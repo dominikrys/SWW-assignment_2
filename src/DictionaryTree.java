@@ -69,14 +69,20 @@ public class DictionaryTree {
 
   /**
    * Removes the specified word from this dictionary. Returns true if the word can be removed as
-   * it's in the DictionaryTree, and false if the input word isn't in the tree.
+   * it's in the DictionaryTree, and false if the input word isn't in the tree. NOTE - this is not
+   * what was initially asked for, explained further in SOLUTION.md
    *
    * @param word the word to delete from this dictionary
    * @return whether or not the parent can delete this node from its children
    */
   public boolean remove(String word) {
+    // If the word is contained in the tree, call the remove helper method to remove it
     if (contains(word)) {
+
       int removeIndex = removeHelper(word, 0, 0);
+
+      // removeIndex !- -1 when nodes have to be removed, and not when just a node has to be set
+      // to not endOfWord
       if (removeIndex != -1) {
         removeRemover(word, removeIndex, 0);
       }
@@ -86,6 +92,9 @@ public class DictionaryTree {
     }
   }
 
+  // remove helper method - checks if the word to be removed is part of another word and if it
+  // is, removes it by setting a node to not be the end of word. If extra nodes would have to be
+  // removed after, this method returns the index from which nodes have to be removed
   private int removeHelper(String word, int indexOfLastEndOfWord, int currentIndex) {
     int result = -1;
     if (word.length() > 1) {
@@ -104,7 +113,9 @@ public class DictionaryTree {
           break;
         }
       }
-    } else {
+    }
+    // When on last character
+    else {
       if (this.isLeaf() || this.endOfWord == false) {
         result = indexOfLastEndOfWord;
       } else {
@@ -115,6 +126,8 @@ public class DictionaryTree {
     return result;
   }
 
+  // This helper is called if nodes have to be removed from the tree - this method removes all
+  // children of the last existing word
   private void removeRemover(String word, int indexOfLastEndOfWord /* the index to remove after */,
       int currentIndex) {
     if (indexOfLastEndOfWord < currentIndex) {
@@ -123,6 +136,7 @@ public class DictionaryTree {
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
         Character key = entry.getKey();
         DictionaryTree value = entry.getValue();
+
         if (key.equals(word.charAt(0))) {
           value.removeRemover(word.substring(1, word.length()), indexOfLastEndOfWord,
               currentIndex + 1);
@@ -161,12 +175,17 @@ public class DictionaryTree {
   }
 
   /**
+   * Predicts a single word based on the input prefix
+   * 
    * @param prefix the prefix of the word returned
    * @return a word that starts with the given prefix, or an empty optional if no such word is
    *         found.
    */
   public Optional<String> predict(String prefix) {
+    // Call the other predict method with n as n = 1
     ArrayList<String> returnedList = (ArrayList<String>) predict(prefix, 1);
+
+    // Convert output into required Optional
     if (returnedList.size() == 0) {
       return Optional.empty();
     } else {
@@ -183,30 +202,68 @@ public class DictionaryTree {
    * @return the (at most) n most popular words with the specified prefix
    */
   public List<String> predict(String prefix, int n) {
-    return predictHelper(prefix, prefix, n);
+    // If prefix is a word, call predictHelper with its popularity. Otherwise with optional -1
+    if (this.contains(prefix)) {
+      return predictHelper(prefix, prefix, n, getPopularity(prefix));
+    } else {
+      return predictHelper(prefix, prefix, n, Optional.of(-1));
+    }
   }
 
-  private List<String> predictHelper(String inputString, String initialString, int n) {
+  // Helper for predict to get the popularity of the prefix - only called if the word exists
+  private Optional<Integer> getPopularity(String inputString) {
+    Optional<Integer> result = Optional.empty();
+    if (inputString.length() > 0) {
+      for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
+        Character key = entry.getKey();
+        DictionaryTree value = entry.getValue();
+
+        if (inputString.length() == 1) {
+          result = popularity;
+          break;
+        }
+        if (key.equals(inputString.charAt(0))) {
+          result = value.getPopularity(inputString.substring(1, inputString.length()));
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  // Helper method for predict which actually checks through the tree
+  private List<String> predictHelper(String inputString, String originalString, int n,
+      Optional<Integer> popularityOfPrefix) {
     List<String> result = new ArrayList<String>();
+
+    // Traverse down the tree until at the depth for possible predicted words to be found - will not
+    // finish if the word to be predicted is not in the arraylist
     if (inputString.length() > 0) {
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
         Character key = entry.getKey();
         DictionaryTree value = entry.getValue();
         if (key.equals(inputString.charAt(0))) {
-          result =
-              value.predictHelper(inputString.substring(1, inputString.length()), initialString, n);
+          result = value.predictHelper(inputString.substring(1, inputString.length()),
+              originalString, n, popularityOfPrefix);
           break;
         }
       }
-    }
-    // adequate size to check any word
-    else {
-      // sort hashmap
-      HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(initialString);
+    } else {
+      // Get a hashmap of all words starting with the specified prefix and their popularities
+      HashMap<String, Optional<Integer>> returnedHashMap = predictStringBuilder(originalString);
 
+      // Insert prefix into returned hashmap if the prefi is contained in the tree
+      if (!popularityOfPrefix.isPresent()) {
+        returnedHashMap.put(originalString, popularityOfPrefix);
+      } else if (popularityOfPrefix.get() != -1) {
+        returnedHashMap.put(originalString, popularityOfPrefix);
+      }
+
+      // Extract values from hashmap
       List<String> mapKeys = new ArrayList<>(returnedHashMap.keySet());
       List<Optional<Integer>> mapValues = new ArrayList<>(returnedHashMap.values());
 
+      // Convert values from optional to int for Collections comparisons
       List<Integer> mapValuesConverted = new ArrayList<>();
       for (Optional<Integer> value : mapValues) {
         if (value.isPresent()) {
@@ -216,6 +273,7 @@ public class DictionaryTree {
         }
       }
 
+      // Sort the hashmap by values
       Collections.sort(mapValuesConverted);
       Collections.sort(mapKeys);
 
@@ -245,7 +303,9 @@ public class DictionaryTree {
         }
       }
 
-      // check amount of zeros
+      // Check amount of words with popularity of 0 - these haven't had a popularity specified and
+      // therefore should appear at the end of numbers with a popularity. Chosen not to use MAX_INT
+      // as having 0 for no popularity made more sense
       int zeroPopularityCounter = 0;
       for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
         Integer value = entry.getValue();
@@ -254,6 +314,7 @@ public class DictionaryTree {
         }
       }
 
+      // Maximum number of words to be output
       int limit = 0;
       if (n > sortedMap.size()) {
         limit = sortedMap.size();
@@ -261,11 +322,14 @@ public class DictionaryTree {
         limit = n;
       }
 
+      // Extract words and popularities
       ArrayList<String> strings = new ArrayList<String>();
       strings.addAll(sortedMap.keySet());
-
       ArrayList<Integer> popularities = new ArrayList<Integer>();
       popularities.addAll(sortedMap.values());
+      
+      // Populate output arraylist with predicted words in order of popularity - words with 
+      // popularity of 0 are appended to the end if they're needed
       result = new ArrayList<String>();
       while (result.size() < limit) {
         if (zeroPopularityCounter >= limit) {
@@ -280,6 +344,7 @@ public class DictionaryTree {
     return result;
   }
 
+  // Helper method for returning a list of words with the input prefix
   private HashMap<String, Optional<Integer>> predictStringBuilder(String inputString) {
     HashMap<String, Optional<Integer>> result = new HashMap<String, Optional<Integer>>();
 
@@ -348,6 +413,7 @@ public class DictionaryTree {
    * @return the number of nodes in this tree
    */
   public int size() {
+    // Size starting from 1 like in the game tree example for the iniial node
     int size = 1;
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -366,7 +432,9 @@ public class DictionaryTree {
     return longestHelper("");
   }
 
+  // Helper for longest which can traverse down the input string
   private String longestHelper(String inputString) {
+    // Make a list of all words that are leaves
     ArrayList<String> words = new ArrayList<String>();
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
       Character key = entry.getKey();
@@ -379,6 +447,7 @@ public class DictionaryTree {
       }
     }
 
+    // Check every word and see which is the longest
     for (String s : words) {
       if (s.length() > inputString.length()) {
         inputString = s;
@@ -392,10 +461,10 @@ public class DictionaryTree {
    * @return all words stored in this tree as a list
    */
   public List<String> allWords() {
-
     return allWordsHelper("");
   }
 
+  // Helper for allWords so it can take an argument
   private ArrayList<String> allWordsHelper(String inputString) {
     ArrayList<String> stringList = new ArrayList<String>();
 
