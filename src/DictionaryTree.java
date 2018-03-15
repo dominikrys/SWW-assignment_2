@@ -19,7 +19,7 @@ public class DictionaryTree {
    * The constructor
    */
   DictionaryTree() {
-    popularity = Optional.empty();
+    this.popularity = Optional.empty();
     this.endOfWord = false;
   }
 
@@ -104,7 +104,7 @@ public class DictionaryTree {
 
         if (key.equals(word.charAt(0))) {
           if (value.endOfWord) {
-            result = value.removeHelper(word.substring(1, word.length()), currentIndex,
+            result = value.removeHelper(word.substring(1, word.length()), currentIndex + 1,
                 currentIndex + 1);
           } else {
             result = value.removeHelper(word.substring(1, word.length()), indexOfLastEndOfWord,
@@ -130,7 +130,7 @@ public class DictionaryTree {
   // children of the last existing word
   private void removeRemover(String word, int indexOfLastEndOfWord /* the index to remove after */,
       int currentIndex) {
-    if (indexOfLastEndOfWord < currentIndex) {
+    if (indexOfLastEndOfWord <= currentIndex) {
       children.clear();
       children = new LinkedHashMap<>();
     } else {
@@ -141,6 +141,7 @@ public class DictionaryTree {
         if (key.equals(word.charAt(0))) {
           value.removeRemover(word.substring(1, word.length()), indexOfLastEndOfWord,
               currentIndex + 1);
+          break;
         }
       }
     }
@@ -328,8 +329,8 @@ public class DictionaryTree {
       strings.addAll(sortedMap.keySet());
       ArrayList<Integer> popularities = new ArrayList<Integer>();
       popularities.addAll(sortedMap.values());
-      
-      // Populate output arraylist with predicted words in order of popularity - words with 
+
+      // Populate output arraylist with predicted words in order of popularity - words with
       // popularity of 0 are appended to the end if they're needed
       result = new ArrayList<String>();
       while (result.size() < limit) {
@@ -369,14 +370,17 @@ public class DictionaryTree {
    *         any other word.
    */
   public int numLeaves() {
-    int leavesNo = 0;
+    // leavesNo initially set to 0 in case it's just the root with no words inserted
+    int leavesNo = 1;
 
     if (!children.isEmpty()) {
+      leavesNo = 0;
+
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
         DictionaryTree value = entry.getValue();
 
         if (value.isLeaf()) {
-          leavesNo += 1;
+          leavesNo++;
         } else {
           leavesNo += value.numLeaves();
         }
@@ -384,6 +388,16 @@ public class DictionaryTree {
     }
 
     return leavesNo;
+  }
+
+  /**
+   * Determines whether the input node is a leaf node
+   * 
+   * @param node which will be checked whether it's a lead node
+   * @return true if the passed node is a leaf, false otherwise
+   */
+  private boolean isLeaf() {
+    return (children.isEmpty());
   }
 
   /**
@@ -414,7 +428,7 @@ public class DictionaryTree {
    * @return the number of nodes in this tree
    */
   public int size() {
-    // Size starting from 1 like in the game tree example for the iniial node
+    // Size starting from 1 like in the game tree example for the initial node
     int size = 1;
 
     for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
@@ -487,20 +501,6 @@ public class DictionaryTree {
   }
 
   /**
-   * Determines whether the input node is a leaf node
-   * 
-   * @param node which will be checked whether it's a lead node
-   * @return true if the passed node is a leaf, false otherwise
-   */
-  private boolean isLeaf() {
-    if (children.isEmpty()) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
    * 
    * /** Folds the tree using the given function. Each of this node's children is folded with the
    * same function, and these results are stored in a collection, cResults, say, then the final
@@ -511,6 +511,7 @@ public class DictionaryTree {
    * @return the result of folding the tree using f
    */
   <A> A fold(BiFunction<DictionaryTree, Collection<A>, A> f) {
+    // return fold((tree, cResults) -> { anonymous function here });
     throw new RuntimeException("DictionaryTree.fold not implemented yet");
   }
 

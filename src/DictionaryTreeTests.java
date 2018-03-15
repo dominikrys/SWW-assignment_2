@@ -13,8 +13,14 @@ public class DictionaryTreeTests {
   @Test
   public void treeContainsWordAferInsertion() {
     DictionaryTree unit = new DictionaryTree();
-    unit.insert("test word");
-    Assertions.assertTrue(unit.contains("test word"));
+    unit.insert("example");
+    Assertions.assertTrue(unit.contains("example"));
+  }
+
+  @Test
+  public void numLeavesReturnsOneIfNoWordsInserted() {
+    DictionaryTree unit = new DictionaryTree();
+    assertEquals(1, unit.numLeaves());
   }
 
   @Test
@@ -29,14 +35,14 @@ public class DictionaryTreeTests {
     unit.insert("word", 0);
     Assertions.assertEquals("word".length(), unit.height());
   }
-  
+
   @Test
   public void sizeShouldBeAmountOfCharactersAndRootAfterOneInsertion() {
     DictionaryTree unit = new DictionaryTree();
     unit.insert("word");
     Assertions.assertEquals(5, unit.size());
   }
-  
+
   @Test
   public void sizeReturnsCorrectAmountOfNodesAfterMultipleInsertions() {
     DictionaryTree unit = new DictionaryTree();
@@ -47,7 +53,7 @@ public class DictionaryTreeTests {
     unit.insert("test");
     Assertions.assertEquals(14, unit.size());
   }
-  
+
   @Test
   public void sizeReturnsRootNodeWhenNoWordsInserted() {
     DictionaryTree unit = new DictionaryTree();
@@ -147,7 +153,7 @@ public class DictionaryTreeTests {
     unit.insert("information");
     assertEquals(Optional.of("information"), unit.predict("info"));
   }
-  
+
   @Test
   public void predictCanReturnItself() {
     DictionaryTree unit = new DictionaryTree();
@@ -194,7 +200,15 @@ public class DictionaryTreeTests {
     unit.remove("information");
     Assertions.assertTrue(unit.contains("info"));
   }
-  
+
+  @Test
+  public void sizeWordsAsIntendedAfterWordRemoved() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("information");
+    unit.remove("information");
+    assertEquals(1, unit.size());
+  }
+
   @Test
   public void predictWithPopularityReturnsObjectsAccordingToPopularity() {
     DictionaryTree unit = new DictionaryTree();
@@ -205,7 +219,7 @@ public class DictionaryTreeTests {
     unit.insert("phones", 247);
     unit.insert("physical", 484);
     unit.insert("photos", 90);
-    
+
     ArrayList<String> predictedWords = (ArrayList<String>) unit.predict("ph", 5);
     ArrayList<String> correctList = new ArrayList<String>();
     correctList.add("phone");
@@ -213,16 +227,28 @@ public class DictionaryTreeTests {
     correctList.add("photos");
     correctList.add("phones");
     correctList.add("physical");
-    
+
     assertEquals(correctList, predictedWords);
   }
-  
+
   @Test
   public void predictReturnsEmptyListIfNoWordFound() {
     DictionaryTree unit = new DictionaryTree();
-    ArrayList <String> emptyArrayList = new ArrayList<String>();
+    ArrayList<String> emptyArrayList = new ArrayList<String>();
     assertEquals(emptyArrayList, unit.predict("word", 4));
   }
-  
-  // more tests
+
+  @Test
+  public void insertOverridesPopularity() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("word", 10);
+    unit.insert("wor", 5);
+    unit.insert("word", 1);
+
+    ArrayList<String> correctList = new ArrayList<String>();
+    correctList.add("word");
+    correctList.add("wor");
+
+    assertEquals(correctList, unit.predict("wo", 2));
+  }
 }

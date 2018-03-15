@@ -14,7 +14,7 @@
 
 * `longestWord` - create an `Arraylist` of all words at each level that are leaves and return the 
 
-* `numLeaves` - check the amount of leaves at each level return. If a node is not a leaf, call the method on it. Highest call will get the total of all leaves.
+* `numLeaves` - check the amount of leaves at each level return. If a node is not a leaf, call the method on it. Highest call will get the total of all leaves. The return value is initially set to 1 and changed to 0 if there are children so that the root node counts as a leaf if no words have been inserted, as `.isEmpty()` can't be called on the `DictionaryTree` object.
 
 * `contains` - checks if each level contains the next character of the input word. If the last node is reached, check if it's the end of the word - return the result.
 
