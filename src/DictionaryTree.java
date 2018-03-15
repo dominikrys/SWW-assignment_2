@@ -132,6 +132,7 @@ public class DictionaryTree {
       int currentIndex) {
     if (indexOfLastEndOfWord < currentIndex) {
       children.clear();
+      children = new LinkedHashMap<>();
     } else {
       for (Map.Entry<Character, DictionaryTree> entry : children.entrySet()) {
         Character key = entry.getKey();
