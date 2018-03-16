@@ -268,10 +268,7 @@ public class DictionaryTreeTests {
     DictionaryTree unit = new DictionaryTree();
     unit.insert("word");
     unit.insert("word1");
-    int beforeSize = unit.size();
     unit.remove("word1");
-    int afterSize = unit.size();
-    Assertions.assertEquals(false, unit.contains("word1"));
-    Assertions.assertEquals(1, beforeSize - afterSize);
+    Assertions.assertEquals(5, unit.size());
   }
 }

@@ -23,10 +23,10 @@ public class CLI {
         new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
       String word;
       DictionaryTree d = new DictionaryTree();
-      int wordLine = 1;
+      int wordLine = -1;
       while ((word = reader.readLine()) != null) {
         d.insert(word, wordLine);
-        wordLine++;
+        wordLine--;
       }
 
       return d;

@@ -114,10 +114,13 @@ public class DictionaryTree {
     // When on last character if more nodes have to be removed, return the index of the last node,
     // otherwise return -1
     else {
-      if (this.isLeaf() || this.endOfWord == false) {
+      if (children.get(word.charAt(0)).isLeaf()
+          || children.get(word.charAt(0)).endOfWord == false) {
         result = indexOfLastEndOfWord;
       } else {
-        this.endOfWord = false;
+        DictionaryTree extractedDictionary = children.get(word.charAt(0));
+        extractedDictionary.endOfWord = false;
+        children.put(word.charAt(0), extractedDictionary);
         result = -1;
       }
     }
