@@ -114,7 +114,7 @@ public class DictionaryTree {
       }
     }
     // When on last character if more nodes have to be removed, return the index of the last node,
-    // otherwise return -1 and set endOfWord to false.
+    // otherwise return -1 and set and set endOfWord to false.
     else {
       if (children.get(word.charAt(0)).isLeaf()
           || children.get(word.charAt(0)).endOfWord == false) {
@@ -310,6 +310,7 @@ public class DictionaryTree {
 
       // Maximum number of words to be output
       int limit = 0;
+      System.out.println(n + ": " + sortedMap.size());
       if (n > sortedMap.size()) {
         limit = sortedMap.size();
       } else {

@@ -1,11 +1,11 @@
 # Solution
-###### GitLab repo: https://git.cs.bham.ac.uk/dxr714/SWW-assignment_2
+###### GitLab repository: https://git.cs.bham.ac.uk/dxr714/SWW-assignment_2
 
 ### Comment on the advantages/disadvantages of using a tree for predicting multiple words with ranked popularities
 
 ##### Advantages
 
-* The data type is a tree - very efficient for finding word predictions as it would run in logarithmtic time.
+* The data type is a tree - very efficient for finding word predictions as it would run in logarithmic time.
 
 * Easy to find words related to the prefix as the algorithm only has to go the depth of the final character in the input prefix, and all words after that depth (including itself) are possible predictions.
 

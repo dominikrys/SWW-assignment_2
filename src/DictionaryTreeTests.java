@@ -228,6 +228,30 @@ public class DictionaryTreeTests {
 
     assertEquals(correctList, predictedWords);
   }
+  
+  @Test
+  public void predictOnlyReturnsAllPossibleWords() {
+    DictionaryTree unit = new DictionaryTree();
+    unit.insert("phone", 484);
+    unit.insert("photo", 247);
+    unit.insert("pile", 37);
+    unit.insert("test");
+    unit.insert("phones", 8);
+    unit.insert("physical", 4);
+    unit.insert("photos", 90);
+    
+    // n specified to be 10 which is much more than the possible amount
+    ArrayList<String> predictedWords = (ArrayList<String>) unit.predict("ph", 10);
+    ArrayList<String> correctList = new ArrayList<String>();
+    correctList.add("phone");
+    correctList.add("photo");
+    correctList.add("photos");
+    correctList.add("phones");
+    correctList.add("physical");
+    
+    assertEquals(correctList, predictedWords);
+  }
+  
 
   @Test
   public void predictReturnsEmptyListIfNoWordFound() {
