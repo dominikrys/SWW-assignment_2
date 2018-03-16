@@ -77,9 +77,10 @@ public class DictionaryTree {
     // If the word is contained in the tree, call the remove helper method to remove it
     if (contains(word)) {
 
+      // removeIndex == -1 when nodes don't have to be removed, otherwise it'sthe index of which
+      // children have to be removed
       int removeIndex = removeHelper(word, 0, 0);
-      // removeIndex !- -1 when nodes have to be removed, and not when just a node has to be set
-      // to not endOfWord
+
       if (removeIndex != -1) {
         removeRemover(word, removeIndex, 0);
       }
@@ -99,6 +100,7 @@ public class DictionaryTree {
         Character key = entry.getKey();
         DictionaryTree value = entry.getValue();
 
+        // Keep traversing down the word, checking if any characters are the end of a word
         if (key.equals(word.charAt(0))) {
           if (value.endOfWord) {
             result = value.removeHelper(word.substring(1, word.length()), currentIndex + 1,
@@ -112,7 +114,7 @@ public class DictionaryTree {
       }
     }
     // When on last character if more nodes have to be removed, return the index of the last node,
-    // otherwise return -1
+    // otherwise return -1 and set endOfWord to false.
     else {
       if (children.get(word.charAt(0)).isLeaf()
           || children.get(word.charAt(0)).endOfWord == false) {
