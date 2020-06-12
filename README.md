@@ -1,4 +1,7 @@
-# Java Word Prediction System
-## 1st year Software Workshop module assignment
+# Trie Word Prediction System
 
-This project consists of a word-prediction system which uses a tree data structure. 
+***1st Year Computer Science Project at the University of Birmingham***
+
+A word-prediction system written in Java which uses a trie data structure.
+
+JUnit unit tests provided.
